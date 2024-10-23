@@ -176,7 +176,6 @@ class MainUi(QWidget):
         self.profileChangePhotoBtn = QPushButton("更换头像", self.profileWidget)
         self.profileChangePhotoBtn.clicked.connect(lambda: self.changeProfilePhoto())
 
-
         profileGoodsWidget = QWidget(self.profileWidget)
 
         self.profileList = QListWidget(profileGoodsWidget)

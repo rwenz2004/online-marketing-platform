@@ -99,6 +99,27 @@ def createTables():
         from message;
     ''')
 
+    db.exec('''
+        create view
+        if not exists
+        statistics as
+        SELECT 
+            u.id AS uid,
+            COALESCE(SUM(CASE WHEN g.status = 'OnSale' THEN 1 ELSE 0 END), 0) AS on_sale_count,
+            COALESCE(COUNT(DISTINCT p.gid), 0) AS purchased_count,
+            COALESCE(COUNT(DISTINCT s.gid), 0) AS sold_count
+        FROM 
+            user u
+        LEFT JOIN 
+            goods g ON u.id = g.uid AND g.status = 'OnSale'
+        LEFT JOIN 
+            purchase p ON u.id = p.uid
+        LEFT JOIN 
+            purchase s ON u.id = (SELECT g.uid FROM goods g WHERE g.id = s.gid)
+        GROUP BY 
+            u.id;
+    ''')
+
 def main():
     app = QApplication(sys.argv)
 

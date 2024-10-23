@@ -1,9 +1,10 @@
 import random
 
 from PyQt6.QtCore import Qt, QSize, pyqtSlot, QTimer
-from PyQt6.QtGui import QPalette
+from PyQt6.QtGui import QPalette, QStandardItemModel
 from PyQt6.QtWidgets import QWidget, QListWidget, QListWidgetItem, QApplication, QHBoxLayout, QGridLayout, QLineEdit, \
-    QPushButton, QGroupBox, QVBoxLayout, QScrollArea, QLabel, QAbstractItemView, QSpacerItem, QSizePolicy, QFileDialog
+    QPushButton, QGroupBox, QVBoxLayout, QScrollArea, QLabel, QAbstractItemView, QSpacerItem, QSizePolicy, QFileDialog, \
+    QTableWidget, QTableView, QHeaderView
 
 from chat import Chat
 from details_ui import GoodsDetailsUi, UserDetailsUi
@@ -211,11 +212,18 @@ class MessagePage(QWidget):
                 chat.insert(str(img.id), _type)
                 self.chatMessageList.addMessage((self.user.id, str(img.id), _type, None))
 
-
 class MyProfilePage(QWidget):
     def __init__(self, parent: NewMainUi):
         super().__init__(parent)
         self.user = parent.user
+        self.profileBox = ProfileBox(self, self.user)
+        self.editProfileButton = QPushButton("编辑资料", self)
+
+        generalLayout = QVBoxLayout()
+        generalLayout.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop)
+        generalLayout.addWidget(self.profileBox)
+        generalLayout.addWidget(self.editProfileButton)
+        self.setLayout(generalLayout)
 
 class GoodsList(QWidget):
     def __init__(self, parent, row=4):
@@ -406,6 +414,23 @@ class MessageEditor(QWidget):
         generalLayout.addWidget(self.textEdit)
         generalLayout.addWidget(self.sendButton)
         self.setLayout(generalLayout)
+
+class ProfileBox(QWidget):
+    def __init__(self, parent, _user):
+        super().__init__(parent)
+        self.user = _user
+
+        self.photo = ImageWidget(self.user.hid, 200, 200, 100, self)
+        self.nameLabel = QLabel(self.user.nickname, self)
+        self.idLabel = QLabel(f"ID:{self.user.id}", self)
+        self.statisticsTable = QTableView(self)
+
+        self.statisticsModel = QStandardItemModel(1, 3)
+        self.statisticsModel.setHorizontalHeaderLabels(["在售", "售出", "购入"])
+        self.statisticsTable.setModel(self.statisticsModel)
+
+    def refreshStatisticsData(self):
+        self.
 
 if __name__ == '__main__':
     app = QApplication([])

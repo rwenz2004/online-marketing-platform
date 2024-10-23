@@ -112,4 +112,13 @@ class User:
     def show(self):
         print(self.nickname, self.password, self.telephone)
 
+    def getStatistics(self) -> (int, int, int):
+        db.exec('''
+            select on_sale_count, purchased_count, sold_count
+            from statistics
+            where uid = ?
+        ''', (self.id, ))
+        result = db.cursor.fetchone()
+        return result
+
     
