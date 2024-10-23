@@ -202,13 +202,14 @@ class MessagePage(QWidget):
             self.chatMessageList.addMessage((self.user.id, content, _type, None))
         elif _type == "image":
             fileName, _ = QFileDialog.getOpenFileName(None, "选择图片", "", "Images (*.png *.xpm *.jpg)")
-            # print(fileName)
-            if fileName:
+            print(fileName)
+            if len(fileName) > 0:
                 img = MyImage()
                 img.openAt(fileName)
                 img.allocId()
                 img.insert()
                 chat.insert(str(img.id), _type)
+                print(img.id)
                 self.chatMessageList.addMessage((self.user.id, str(img.id), _type, None))
 
 
@@ -409,6 +410,9 @@ class MessageEditor(QWidget):
 
 if __name__ == '__main__':
     app = QApplication([])
+    MyImage.init()
+    User.init()
+    Goods.init()
     user = User(10000)
     user.read()
     window = NewMainUi(user=user)
