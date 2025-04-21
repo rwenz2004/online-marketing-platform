@@ -1,4 +1,4 @@
-from database import db
+import remote
 from myimage import defaultCoverId
 
 
@@ -16,9 +16,10 @@ class Goods:
 
     @staticmethod
     def init():
-        
-        if result[0] is not None:
-            Goods.nextId = result[0] + 1
+        result = remote.get_max_id("goods")
+        if result is not None:
+            print(f"max goods id: {result}")
+            Goods.nextId = result + 1
 
     @staticmethod
     def getOnSaleIdList(uid) -> list | None:

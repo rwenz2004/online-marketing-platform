@@ -132,41 +132,6 @@ def get_max_id():
     except Exception as e:
         return jsonify({"error": f"Server Error: {e}"}), 400
 
-
-@app.route('/execute', methods=['POST'])
-def execute():
-    try:
-        data = request.json
-        print(data)
-        sql = data['sql']
-        params = data.get('params', {})
-        
-        conn = sqlite3.connect('omp.db')
-        cursor = conn.cursor()
-        
-        # 根据参数类型执行 SQL
-        if isinstance(params, dict):
-            cursor.execute(sql, params)
-        else:
-            cursor.execute(sql, params)
-        
-        if sql.lstrip().upper().startswith('SELECT'):
-            results = cursor.fetchall()
-            return jsonify({'result': results})
-        else:
-            conn.commit()
-            return jsonify({'status': 'success'})
-    
-    except sqlite3.Error as e:
-        return jsonify({'error': f"Database error: {str(e)}"}), 500
-    
-    except Exception as e:
-        return jsonify({'error': f"Server error: {str(e)}"}), 500
-    
-    finally:
-        cursor.close()
-        conn.close()
-
 if __name__ == '__main__':
     database_init()
     app.run(host='0.0.0.0', port=5000)

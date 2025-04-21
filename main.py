@@ -10,8 +10,8 @@ from user import User
 def main():
     app = QApplication(sys.argv)
 
-    MyImage.init()
-    User.init()
+    # MyImage.init()
+    # User.init()
     Goods.init()
 
     login = LoginUi()
