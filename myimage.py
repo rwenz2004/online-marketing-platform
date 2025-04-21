@@ -7,6 +7,7 @@ from database import db
 
 defaultPhotoId = 0
 defaultCoverId = 1
+addGoodsIconId = 2
 
 class MyImage:
     nextId = 0
@@ -30,6 +31,11 @@ class MyImage:
             image = MyImage()
             image.allocId()
             image.openAt("./default_cover.png")
+            image.insert()
+        if MyImage.nextId == addGoodsIconId:
+            image = MyImage()
+            image.allocId()
+            image.openAt("./add_goods.jpg")
             image.insert()
 
     def allocId(self):

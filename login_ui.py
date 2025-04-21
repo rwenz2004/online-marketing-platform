@@ -4,8 +4,8 @@ from PyQt6.QtWidgets import QWidget, QDialog, QPushButton, QRadioButton, QLineEd
     QHBoxLayout, QVBoxLayout, QButtonGroup, QFileDialog, QSpacerItem, QSizePolicy, QMenu, QMessageBox
 
 from image_widget import ImageWidget
-from main_ui import MainUi
 from myimage import defaultPhotoId, MyImage
+from new_main_ui import NewMainUi
 from user import User
 import re
 
@@ -96,8 +96,10 @@ class LoginUi(QDialog):
         self.registerNameEdit = QLineEdit(self.registerWidget)
         self.registerNameEdit.setPlaceholderText("输入昵称(2~8个中英文或数字字符)")
         self.registerPasswordEdit = QLineEdit(self.registerWidget)
+        self.registerPasswordEdit.setEchoMode(QLineEdit.EchoMode.Password)
         self.registerPasswordEdit.setPlaceholderText("输入密码(6~20字符)")
         self.registerRepeatEdit = QLineEdit(self.registerWidget)
+        self.registerRepeatEdit.setEchoMode(QLineEdit.EchoMode.Password)
         self.registerRepeatEdit.setPlaceholderText("重复密码")
         self.registerBtn = QPushButton("注册", self.registerWidget)
         self.registerBtn.clicked.connect(lambda: self.tryRegister())
@@ -175,7 +177,7 @@ class LoginUi(QDialog):
             self.registerWidget.show()
 
     def login(self):
-        self.mainWindow = MainUi(self.user)
+        self.mainWindow = NewMainUi(self.user)
         self.mainWindow.show()
         self.deleteLater()
 

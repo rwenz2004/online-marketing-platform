@@ -9,7 +9,7 @@ from myimage import MyImage, defaultPhotoId
 class ImageWidget(QPushButton):
     def __init__(self, imgId=defaultPhotoId, width=200, height=200, radius=100, parent=None):
         super().__init__(parent)
-        self.image = None
+        self.image:QPixmap|None = None
         self.changeImageFromId(imgId)
         self.setFixedSize(width, height)
         self.radius = radius

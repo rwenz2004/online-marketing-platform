@@ -16,8 +16,7 @@ class Goods:
 
     @staticmethod
     def init():
-        db.exec("select MAX(id) from goods")
-        result = db.cursor.fetchone()
+        
         if result[0] is not None:
             Goods.nextId = result[0] + 1
 
@@ -29,6 +28,34 @@ class Goods:
             where uid <> ?
         ''', (uid, ))
         return db.cursor.fetchall()
+
+    @staticmethod
+    def getGoodsListSatisfy(uid, status = "%") -> list:
+        if status == "Bought":
+            return Goods.getBoughtGoodsList(uid)
+        db.exec('''
+            select id
+            from goods
+            where uid=? and status like ?
+        ''', (uid, status))
+        result = db.cursor.fetchall()
+        ret = []
+        for i in result:
+            ret.append(i[0])
+        return ret
+
+    @staticmethod
+    def getBoughtGoodsList(uid) -> list:
+        db.exec('''
+                select gid
+                from purchase
+                where uid=?
+            ''', (uid,))
+        result = db.cursor.fetchall()
+        ret = []
+        for i in result:
+            ret.append(i[0])
+        return ret
 
     def allocId(self):
         self.id = Goods.nextId
@@ -62,3 +89,34 @@ class Goods:
 
     def show(self):
         print(self.id, self.name, self.status, self.description)
+
+    def getCreateTime(self):
+        db.exec('''
+            select time
+            from goods
+            where id=?
+        ''', (self.id,))
+        result = db.cursor.fetchone()
+        if result is None:
+            return None
+        else:
+            return result[0]
+
+    @staticmethod
+    def blurSearch(uid, text) -> list:
+        print("text:", text)
+        result = []
+        if len(text) > 0:
+            db.exec('''
+                        SELECT g.id
+                        FROM goods g
+                        JOIN user u ON g.uid = u.id
+                        WHERE g.name LIKE '%?%' OR u.nickname LIKE '%?%';
+                    ''', (text, text))
+            result = db.cursor.fetchall()
+        else:
+            result = Goods.getOnSaleIdList(uid)
+        ret = []
+        for i in result:
+            ret.append(i[0])
+        return ret

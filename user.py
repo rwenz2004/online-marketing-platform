@@ -114,7 +114,7 @@ class User:
 
     def getStatistics(self) -> (int, int, int):
         db.exec('''
-            select on_sale_count, purchased_count, sold_count
+            select on_sale_count, sold_count, purchased_count
             from statistics
             where uid = ?
         ''', (self.id, ))
