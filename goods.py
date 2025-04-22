@@ -18,9 +18,10 @@ class Goods:
     def init():
         result = remote.get_max_id("goods")
         if result is not None:
-            print(f"max goods id: {result}")
             Goods.nextId = result + 1
-
+        else:
+            exit(-1)
+            
     @staticmethod
     def getOnSaleIdList(uid) -> list | None:
         db.exec('''

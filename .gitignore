@@ -1,1 +1,8 @@
-/test.py
+test.py
+__pycache__/
+test/
+.vscode/
+*.pyc
+*.pyo
+*.pyd
+.venv/

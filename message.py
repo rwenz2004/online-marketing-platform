@@ -1,5 +1,4 @@
-from database import db
-
+import remote
 
 class Message:
     nextId = 0
@@ -12,50 +11,27 @@ class Message:
 
     @staticmethod
     def init():
-        db.exec('''
-            select
-                MAX(id)
-            from
-                message
-        ''')
-        result = db.cursor.fetchone()
-        if result[0] is not None:
-            Message.nextId = result[0] + 1
+        result = remote.get_max_id("message")
+        if result is not None:
+            Message.nextId = result + 1
+        else:
+            exit(-1)
 
     def allocId(self):
         self.id = Message.nextId
         Message.nextId += 1
 
     def insert(self):
-        db.exec('''
-            insert into
-            message(id, sender, receiver, content, type)
-            values (?,?,?,?,?)
-        ''', (self.id, self.sender, self.receiver, self.content, self.type))
-
+        remote.insert_message(self.id, self.sender, self.receiver, self.content, self.type)
+        
     def read(self) -> bool:
-        db.exec('''
-            select
-                sender, receiver, content, type
-            from
-                message
-            where
-                id = ?
-        ''', (self.id,))
-        result = db.cursor.fetchone()
-        if result is None:
-            return False
-        else:
-            (self.sender, self.receiver, self.content, self.type) = result
+        result = remote.get_message(self.id)
+        if result is not None:
+            self.sender, self.receiver, self.content, self.type = result
             return True
+        else:
+            return False
 
     def write(self):
-        db.exec('''
-            update
-                message
-            set
-                sender=?, receiver=?, content=?, type=?
-            where
-                id=?
-        ''', (self.sender, self.receiver, self.content, self.type, self.id))
+        remote.set_message(self.id, self.sender, self.receiver, self.content, self.type)
 

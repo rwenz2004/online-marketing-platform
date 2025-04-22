@@ -3,7 +3,7 @@ import base64
 from PyQt6.QtCore import QByteArray
 from PyQt6.QtGui import QImage, QPixmap, QIcon
 
-from database import db
+import remote
 
 defaultPhotoId = 0
 defaultCoverId = 1
@@ -17,11 +17,12 @@ class MyImage:
 
     @staticmethod
     def init():
-        db.exec("select MAX(id) from image")
-        result = db.cursor.fetchone()
-        if result[0] is not None:
-            MyImage.nextId = result[0] + 1
-            # print(MyImage.nextId)
+        result = remote.get_max_id("image")
+        if result is not None:
+            MyImage.nextId = result + 1
+        else:
+            exit(-1)
+
         if MyImage.nextId == defaultPhotoId:
             image = MyImage()
             image.allocId()
@@ -43,29 +44,17 @@ class MyImage:
         MyImage.nextId += 1
 
     def insert(self):
-        db.exec('''
-            insert into image(id, data)
-            values (?, ?)
-        ''', (self.id, self.data))
+        remote.insert_image(self.id, self.data)
 
     def read(self):
-        db.exec('''
-            select data
-            from image
-            where id = ?
-        ''', (self.id,))
-        result = db.cursor.fetchone()
-        if result[0] is not None:
-            self.data = result[0]
+        result = remote.get_image(self.id)
+        if result is not None:
+            self.data = result
         return self
 
     def write(self):
-        db.exec('''
-            update image
-            set data = ?
-            where id = ?
-        ''', (self.data, self.id))
-
+        remote.set_image(self.id, self.data)
+        
     def openAt(self, fileName):
         file = open(fileName, "rb")
         self.data = file.read()
