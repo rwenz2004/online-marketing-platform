@@ -10,7 +10,6 @@ class User:
     #静态方法
     @staticmethod
     def init():
-
         db.exec("select MAX(id) from user")
         result = db.cursor.fetchone()
         if result[0] is not None:

@@ -16,7 +16,8 @@ class Goods:
 
     @staticmethod
     def init():
-        
+        db.exec("select MAX(id) from goods")
+        result = db.cursor.fetchone()
         if result[0] is not None:
             Goods.nextId = result[0] + 1
 
