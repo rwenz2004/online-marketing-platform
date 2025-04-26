@@ -1,0 +1,188 @@
+@startuml ER
+skinparam class {
+  BackgroundColor<<entity>> LightYellow
+  ArrowColor black
+}
+
+entity 用户 {
+  - id (INTEGER) PK
+  - hid (INTEGER)
+  - nickname (TEXT)
+  - password (TEXT)
+  - telephone (TEXT)
+}
+
+entity 商品 {
+  - id (INTEGER) PK
+  - uid (INTEGER)
+  - cid (INTEGER)
+  - name (TEXT)
+  - price (REAL)
+  - time (DATETIME)
+  - status (TEXT)
+  - description (TEXT)
+}
+
+entity 购买信息 {
+  - uid (INTEGER)
+  - gid (INTEGER)
+  - price (REAL)
+  - time (DATETIME)
+}
+
+entity 消息 {
+  - id (INTEGER) PK
+  - sender (INTEGER)
+  - receiver (INTEGER)
+  - type (TEXT)
+  - content (TEXT)
+  - time (DATETIME)
+}
+
+entity 图像 {
+  - id (INTEGER) PK
+  - data (BLOB)
+}
+
+用户 "1" -- "0..*" 商品 : 卖家 (uid)
+用户 "1" -- "0..*" 购买信息 : 购买者 (uid)
+商品 "1" -- "1" 图像 : 商品图片 (cid)
+用户 "1" -- "0..*" 消息 : 发送者 (sender)
+用户 "1" -- "0..*" 消息 : 接收者 (receiver)
+用户 "1" -- "0..1" 图像 : 头像 (hid)
+
+note right of 用户
+  hid 引用图像.id（头像）
+end note
+
+note right of 商品
+  cid 引用图像.id（商品图片）
+end note
+
+@enduml
+
+
+
+@startuml classDiagram
+class User {
+  + int id // 主键
+  + int hid // 头像ID，引用Image.id
+  + String nickname
+  + String password
+  + String telephone
+}
+
+class Goods {
+  + int id // 主键
+  + int uid // 卖家ID，引用User.id
+  + int cid // 商品图片ID，引用Image.id
+  + String name
+  + double price
+  + datetime time // 上架时间，默认当前时间
+  + String status // 状态（OnSale/SoldOut/Removed/Unknown）
+  + String description
+}
+
+class Purchase {
+  + int uid // 购买者ID，引用User.id
+  + int gid // 商品ID，引用Goods.id
+  + double price // 购买价格
+  + datetime time // 购买时间，默认当前时间
+}
+
+class Message {
+  + int id // 主键，自动递增
+  + int sender // 发送者ID，引用User.id
+  + int receiver // 接收者ID，引用User.id
+  + String type // 消息类型（text/image）
+  + String content
+  + datetime time // 发送时间，默认当前时间
+}
+
+class Image {
+  + int id // 主键
+  + BLOB data // 图像二进制数据
+}
+
+' 关联关系
+User "1" --> "0..*" Goods : 卖家
+User "1" --> "0..*" Purchase : 购买者
+Goods "1" --> "1" Image : 商品图片
+User "1" --> "0..*" Message : 发送者
+User "1" --> "0..*" Message : 接收者
+Message "1" --> "1" User : 发送者
+Message "1" --> "1" User : 接收者
+User "1" --> "0..1" Image : 头像
+
+@enduml
+
+@startuml registerAndLoginSequenceDiagram
+title 用户注册与登录流程图
+
+actor 用户
+participant 客户端
+participant 服务端
+
+alt 用户选择注册
+    用户 -> 客户端: 填写注册信息
+    客户端 -> 服务端: 提交注册信息
+    服务端 -> 服务端: 验证注册信息
+    服务端 --> 客户端: 返回注册结果
+    客户端 -> 用户: 显示注册结果
+else 用户选择登录
+    用户 -> 客户端: 填写账号信息
+    客户端 -> 服务端: 提交登录请求
+    服务端 -> 服务端: 验证登录信息
+    服务端 --> 客户端: 返回验证结果
+
+    alt 登录成功
+        客户端 -> 服务端: 获取在售商品列表
+        服务端 -> 客户端: 返回商品列表
+        客户端 -> 客户端: 生成“首页”
+        客户端 -> 用户: 显示“首页”
+    else 登录失败
+        客户端 -> 用户: 显示登录失败信息
+    end
+end
+@enduml
+
+@startuml purchaseSequenceDiagram
+title 商品购买流程图
+
+actor 买家
+actor 卖家
+participant 客户端
+participant 服务端
+
+买家 -> 客户端: 进入首页并浏览商品
+客户端 -> 服务端: 获取商品列表和详情
+服务端 --> 客户端: 返回商品信息
+客户端 -> 买家: 显示商品
+
+买家 -> 客户端: 点击购买
+客户端 -> 服务端: 提交购买请求
+服务端 -> 服务端: 验证并处理请求
+服务端 -> 卖家: 通知卖家处理
+卖家 -> 服务端: 返回处理结果
+服务端 --> 客户端: 返回购买结果
+客户端 -> 买家: 显示结果
+
+@enduml
+
+@startuml chatSequenceDiagram
+title 实时聊天流程图
+
+actor 用户A
+actor 用户B
+participant 客户端A
+participant 客户端B
+participant 服务端
+
+用户A -> 客户端A: 输入消息内容
+客户端A -> 服务端: 发送消息（消息内容, 接收者ID）
+服务端 -> 数据库: 存储消息到数据库
+数据库 --> 服务端: 返回存储成功
+服务端 -> 客户端B: 推送消息（消息内容, 发送者ID）
+客户端B -> 用户B: 显示消息内容
+
+@enduml
